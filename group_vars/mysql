@@ -1,0 +1,4 @@
+---
+NFS_EXPORT: /datapath
+NFS_IMPORT: /data
+RPCNFSDCOUNT: 32

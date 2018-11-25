@@ -1,0 +1,40 @@
+---
+- name: install nfs server (rhel & ubuntu)
+  package:
+    name: nfs-kernel-server
+    state: present
+  when: ansible_distribution == 'RedHat' or ansible_distribution == 'Ubuntu'
+
+- name: configure nfs parameters (RPCNFSDCOUNT) (ubuntu)
+  lineinfile:
+    path: /etc/default/nfs-kernel-server
+    regexp: '^RPCNFSDCOUNT='
+    line: 'RPCNFSDCOUNT={{ RPCNFSDCOUNT }}'
+  when: ansible_distribution == 'Ubuntu'
+  notify:
+    - restart nfs server (ubuntu)
+
+- name: create directory for nfs export
+  file:
+    path: "{{ NFS_EXPORT }}"
+    recurse: yes
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: nfs export directory
+  lineinfile:
+    path: /etc/exports
+    create: yes
+    regexp: "^{{ NFS_EXPORT }}.*$"
+    line: "{{ NFS_EXPORT }} *(rw,sync,no_root_squash,no_subtree_check)"
+  notify:
+    - restart nfs server (ubuntu)
+
+- name: start and enable at boot nfs server (ubuntu)
+  service:
+    name: nfs-kernel-server.service
+    enabled: yes
+    state: started
+  when: ansible_distribution == 'Ubuntu'

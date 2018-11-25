@@ -1,0 +1,21 @@
+---
+- name: install nfs packages (rhel & ubuntu)
+  package: name={{item}} state=present
+  with_items:
+    - nfs-common
+  when: ansible_distribution == 'RedHat' or ansible_distribution == 'Ubuntu'
+
+- name: create directory for nfs mount
+  file:
+    path: "{{ NFS_IMPORT }}"
+    state: directory
+
+- name: mount nfs export
+  mount:
+    path: "{{ NFS_IMPORT }}"
+    src: "{{ hostvars[item]['ansible_host'] }}:{{ NFS_EXPORT }}"
+    fstype: nfs
+    opts: lookupcache=pos,noatime,intr,rsize=32768,wsize=32768
+    state: mounted
+  with_items: "{{ groups['mysql_fileserver'] }}"
+  when: "'mysql' in inventory_hostname"

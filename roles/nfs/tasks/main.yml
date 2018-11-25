@@ -1,0 +1,5 @@
+---
+- include: client.yml
+  when: client is defined
+- include: server.yml
+  when: server is defined

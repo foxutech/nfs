@@ -1,0 +1,8 @@
+---
+- hosts: fileserver
+  connection: local
+  become: yes
+  gather_facts: false
+  roles:
+    - { role: nfs, server: true }
+    - { role: nfs, client: true }

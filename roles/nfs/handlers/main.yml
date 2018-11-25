@@ -1,0 +1,6 @@
+---
+- name: restart nfs server (ubuntu)
+  service:
+    name: nfs-kernel-server.service
+    state: restarted
+  when: ansible_distribution == 'Ubuntu'
